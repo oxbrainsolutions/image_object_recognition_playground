@@ -584,7 +584,7 @@ st.markdown("""
         }
         @media (max-width: 1024px) {
           div.css-1inwz65.ew7r33m0 {
-            font-size: 0.8em !important;
+            font-size: 3.6em !important;
             font-family: sans-serif !important;
           }
           div.StyledThumbValue.css-12gsf70.ew7r33m2{
