@@ -378,13 +378,13 @@ styles2 = """
     }
     .left2 {
         text-align: center;
-        width: 80%;
+        width: 90%;
         padding-top: 0em;
         padding-bottom: 0em;
     }
     .right2 {
         text-align: center;
-        width: 20%;
+        width: 10%;
         padding-top: 0em;
         padding-bottom: 0em;
     }
@@ -849,22 +849,10 @@ with col2:
       net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
       st.session_state[cache_key] = net
 
-  text_media_query = '''
-  <style>
-  @media (max-width: 1024px) {
-    p.text {
-        font-size: 4em;
-    }
-  }
-  </style>
-  '''
-    
-  text = '<p class="text" style="margin-top: 0em; margin-bottom: 0em;"><span style="font-family:sans-serif; color:#FAFAFA; font-size: 0.8em; ">Probability Threshold</span></p>'
-  st.markdown(text_media_query + text, unsafe_allow_html=True)
   html = """
   <div class="col2">
       <div class="left2">
-          <p class="subtext_manual2" style="tyle="text-align: center;"><span style="font-family: sans-serif; color:#FAFAFA; font-size: 1em;">Click here for more information</span></p>
+          <p class="subtext_manual2" style="tyle="text-align: left;"><span style="font-family: sans-serif; color:#FAFAFA; font-size: 1em;">Probability Threshold</span></p>
       </div>
       <div class="right2">
           <div class="tooltip2">
