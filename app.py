@@ -1,12 +1,12 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer
+from streamlit_webrtc import WebRtcMode, webrtc_streamer
 import numpy as np
 import pathlib
 import base64
 import cv2
-from PIL import Image
-import os
-
+import queue
+from pathlib import Path
+from typing import List, NamedTuple
 
 st.set_page_config(page_title="Object Recognition Playground", page_icon="images/oxbrain_favicon.png", layout="wide")
 
@@ -35,7 +35,13 @@ CLASSES = [
     "train",
     "tvmonitor",
 ]
-COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
+
+@st.cache_resource  # type: ignore
+def generate_label_colors():
+    return np.random.uniform(0, 255, size=(len(CLASSES), 3))
+
+COLORS = generate_label_colors()
+
 
 DEFAULT_CONFIDENCE_THRESHOLD = 0.5
 MODEL = "model/MobileNetSSD_deploy.caffemodel"
@@ -837,69 +843,88 @@ with col2:
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
 
-@st.cache
-def process_image(image):
+
+cache_key = "object_detection_dnn"
+if cache_key in st.session_state:
+    net = st.session_state[cache_key]
+else:
+    net = cv2.dnn.readNetFromCaffe(str(PROTOTXT_LOCAL_PATH), str(MODEL_LOCAL_PATH))
+    st.session_state[cache_key] = net
+
+score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
+
+result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
+
+def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
+    image = frame.to_ndarray(format="bgr24")
+
+    # Run inference
     blob = cv2.dnn.blobFromImage(
         cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
     )
-    net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
     net.setInput(blob)
-    detections = net.forward()
-    return detections
+    output = net.forward()
+
+    h, w = image.shape[:2]
+
+    # Convert the output array into a structured form.
+    output = output.squeeze()  # (1, 1, N, 7) -> (N, 7)
+    output = output[output[:, 2] >= score_threshold]
+    detections = [
+        Detection(
+            class_id=int(detection[1]),
+            label=CLASSES[int(detection[1])],
+            score=float(detection[2]),
+            box=(detection[3:7] * np.array([w, h, w, h])),
+        )
+        for detection in output
+    ]
+
+    # Render bounding boxes and captions
+    for detection in detections:
+        caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
+        color = COLORS[detection.class_id]
+        xmin, ymin, xmax, ymax = detection.box.astype("int")
+
+        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+        cv2.putText(
+            image,
+            caption,
+            (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.5,
+            color,
+            2,
+        )
+
+    result_queue.put(detections)
+
+    return av.VideoFrame.from_ndarray(image, format="bgr24")
 
 
-@st.cache
-def annotate_image(
-    image, detections, confidence_threshold=DEFAULT_CONFIDENCE_THRESHOLD
-):
-    # loop over the detections
-    (h, w) = image.shape[:2]
-    labels = []
-    for i in np.arange(0, detections.shape[2]):
-        confidence = detections[0, 0, i, 2]
-
-        if confidence > confidence_threshold:
-            # extract the index of the class label from the `detections`,
-            # then compute the (x, y)-coordinates of the bounding box for
-            # the object
-            idx = int(detections[0, 0, i, 1])
-            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-            (startX, startY, endX, endY) = box.astype("int")
-
-            # display the prediction
-            label = f"{CLASSES[idx]}: {round(confidence * 100, 2)}%"
-            labels.append(label)
-            cv2.rectangle(image, (startX, startY), (endX, endY), COLORS[idx], 2)
-            y = startY - 15 if startY - 15 > 15 else startY + 15
-            cv2.putText(
-                image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2
-            )
-    return image, labels
-
-
-st.title("Object detection with MobileNet SSD")
-img_file_buffer = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-confidence_threshold = st.slider(
-    "Confidence threshold", 0.0, 1.0, DEFAULT_CONFIDENCE_THRESHOLD, 0.05
+webrtc_ctx = webrtc_streamer(
+    key="object-detection",
+    mode=WebRtcMode.SENDRECV,
+    rtc_configuration={
+        "iceServers": get_ice_servers(),
+        "iceTransportPolicy": "relay",
+    },
+    video_frame_callback=video_frame_callback,
+    media_stream_constraints={"video": True, "audio": False},
+    async_processing=True,
 )
 
-if img_file_buffer is not None:
-    image = np.array(Image.open(img_file_buffer))
-
-else:
-    blank_image = np.zeros((heigh, width, 3), dtype=np.uint8)
-    image = blank_image
-
-detections = process_image(image)
-image, labels = annotate_image(image, detections, confidence_threshold)
-
-st.image(
-    image, caption=f"Processed image", use_column_width=True,
-)
-
-st.write(labels)
-    
-
+if st.checkbox("Show the detected labels", value=True):
+    if webrtc_ctx.state.playing:
+        labels_placeholder = st.empty()
+        # NOTE: The video transformation with object detection and
+        # this loop displaying the result labels are running
+        # in different threads asynchronously.
+        # Then the rendered video frames and the labels displayed here
+        # are not strictly synchronized.
+        while True:
+            result = result_queue.get()
+            labels_placeholder.table(result)
 
 
 
