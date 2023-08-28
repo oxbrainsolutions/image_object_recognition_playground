@@ -400,7 +400,7 @@ styles2 = """
     /* Tooltip text */
     .tooltip2 .tooltiptext2 {
         visibility: hidden;
-        width: 70em;
+        width: 50em;
         background-color: #03A9F4;
         color: #FAFAFA;
         text-align: justify;
