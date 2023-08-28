@@ -552,7 +552,7 @@ st.markdown("""
     .css-f4ro0r {
         align-items: center !important;
     }
-    .MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.css-1b655ro {
+    .css-1b655ro {
         background-color: #002147 !important;
         color: #FAFAFA !important;
         text-transform: capitalize !important;
@@ -562,7 +562,10 @@ st.markdown("""
         font-family: sans-serif !important;
         width: 50% !important;
     }
-
+    .css-y4arc3  {
+        border: 0.1875em solid #002147 !important;
+        color: #FCBC24 !important;
+    }
     
         div.css-1inwz65.ew7r33m0 {
             font-size: 0.8em !important;
