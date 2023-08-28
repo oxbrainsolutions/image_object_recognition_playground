@@ -723,17 +723,6 @@ line_media_query2 = '''
     </style>
 '''
 
-def callback(frame):
-    img = frame.to_ndarray(format="bgr24")
-    img = frame.to_ndarray(format="bgr24") 
-    img = cv2.cvtColor(cv2.Canny(img, 100, 200), cv2.COLOR_GRAY2BGR)
-    return av.VideoFrame.from_ndarray(img, format="bgr24")
-
-def img_to_bytes(img_path):
-    img_bytes = pathlib.Path(img_path).read_bytes()
-    encoded = base64.b64encode(img_bytes).decode()
-    return encoded
-
 header = """
     <style>
         :root {{
@@ -845,6 +834,8 @@ with col2:
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
 
+col1, col2, col3 = st.columns([2, 4, 2])
+with col2:
   cache_key = "object_detection_dnn"
   if cache_key in st.session_state:
       net = st.session_state[cache_key]
@@ -861,7 +852,7 @@ with col2:
 
       # Run inference
       blob = cv2.dnn.blobFromImage(
-          cv2.resize(image, (200, 200)), 0.007843, (200, 200), 127.5
+          cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
       )
       net.setInput(blob)
       output = net.forward()
