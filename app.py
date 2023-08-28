@@ -34,6 +34,11 @@ CLASSES = [
 ]
 COLORS = np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
+DEFAULT_CONFIDENCE_THRESHOLD = 0.5
+MODEL = "model/MobileNetSSD_deploy.caffemodel"
+PROTOTXT = "model/MobileNetSSD_deploy.prototxt.txt"
+
+
 marker_spinner_css = """
 <style>
     #spinner-container-marker {
@@ -829,11 +834,67 @@ with col2:
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns([1, 2, 1])
-with col2:    
-  webrtc_streamer(key="video", video_frame_callback=callback, rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+@st.cache
+def process_image(image):
+    blob = cv2.dnn.blobFromImage(
+        cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
+    )
+    net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
+    net.setInput(blob)
+    detections = net.forward()
+    return detections
 
-  st.write("hello2")
+
+@st.cache
+def annotate_image(
+    image, detections, confidence_threshold=DEFAULT_CONFIDENCE_THRESHOLD
+):
+    # loop over the detections
+    (h, w) = image.shape[:2]
+    labels = []
+    for i in np.arange(0, detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+
+        if confidence > confidence_threshold:
+            # extract the index of the class label from the `detections`,
+            # then compute the (x, y)-coordinates of the bounding box for
+            # the object
+            idx = int(detections[0, 0, i, 1])
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")
+
+            # display the prediction
+            label = f"{CLASSES[idx]}: {round(confidence * 100, 2)}%"
+            labels.append(label)
+            cv2.rectangle(image, (startX, startY), (endX, endY), COLORS[idx], 2)
+            y = startY - 15 if startY - 15 > 15 else startY + 15
+            cv2.putText(
+                image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, COLORS[idx], 2
+            )
+    return image, labels
+
+
+st.title("Object detection with MobileNet SSD")
+img_file_buffer = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+confidence_threshold = st.slider(
+    "Confidence threshold", 0.0, 1.0, DEFAULT_CONFIDENCE_THRESHOLD, 0.05
+)
+
+if img_file_buffer is not None:
+    image = np.array(Image.open(img_file_buffer))
+
+else:
+    blank_image = np.zeros(heigh, width, 3), dtype=np.uint8)
+    image = blank_image
+
+detections = process_image(image)
+image, labels = annotate_image(image, detections, confidence_threshold)
+
+st.image(
+    image, caption=f"Processed image", use_column_width=True,
+)
+
+st.write(labels)
     
 
 
