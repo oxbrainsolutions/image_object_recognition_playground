@@ -840,79 +840,81 @@ with col2:
   '''
   st.markdown(header_media_query + header_text, unsafe_allow_html=True)
   information_text1 = '''
-    <p class="information_text" style="margin-top: 2em; margin-bottom: 2em; text-align: justify;"><span style="color: #FAFAFA; font-family: sans-serif; font-size: 1em; ">In this interactive playground, you can explore the capabilities of AI and ML models to detect, recognize and identify faces within images in real-time. To begin, simply start the camera to allow a facial recognition model to locate your face in the video. Additionally, by training the model on your image, the software will learn to differentiate your face from others and identify you accurately.</span></p>
+    <p class="information_text" style="margin-top: 2em; margin-bottom: 2em; text-align: justify;"><span style="color: #FAFAFA; font-family: sans-serif; font-size: 1em; ">In this interactive playground, you can explore the capabilities of AI and ML models to detect, recognize and identify objects within images in real-time. To begin, simply start the camera to allow an object recognition model to locate objects in the video. Investigate the tradeoff between precision and sensitivity of the model by tweaking the probability threshold, which determines the confidence level required for an object to be detected and recognized.</span></p>
   '''
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
 
+#The probability threshold is set based on a desired balance between minimizing both false positives (higher precision) and false negatives (higher sensitivity). Increasing the threshold value results in only objects with a high confidence level being detected, generating fewer but more reliable detections. Decreasing the threshold value creates more detections, including objects with slightly lower confidence scores; however, this may also introduce more false positives or incorrect detections.
 
-cache_key = "object_detection_dnn"
-if cache_key in st.session_state:
-    net = st.session_state[cache_key]
-else:
-    net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
-    st.session_state[cache_key] = net
 
-score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
-
-result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
-
-def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
-    image = frame.to_ndarray(format="bgr24")
-
-    # Run inference
-    blob = cv2.dnn.blobFromImage(
-        cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
+    cache_key = "object_detection_dnn"
+    if cache_key in st.session_state:
+        net = st.session_state[cache_key]
+    else:
+        net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
+        st.session_state[cache_key] = net
+    
+    score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
+    
+    result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
+    
+    def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
+        image = frame.to_ndarray(format="bgr24")
+    
+        # Run inference
+        blob = cv2.dnn.blobFromImage(
+            cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
+        )
+        net.setInput(blob)
+        output = net.forward()
+    
+        h, w = image.shape[:2]
+    
+        # Convert the output array into a structured form.
+        output = output.squeeze()  # (1, 1, N, 7) -> (N, 7)
+        output = output[output[:, 2] >= score_threshold]
+        detections = [
+            Detection(
+                class_id=int(detection[1]),
+                label=CLASSES[int(detection[1])],
+                score=float(detection[2]),
+                box=(detection[3:7] * np.array([w, h, w, h])),
+            )
+            for detection in output
+        ]
+    
+        # Render bounding boxes and captions
+        for detection in detections:
+            caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
+            color = COLORS[detection.class_id]
+            xmin, ymin, xmax, ymax = detection.box.astype("int")
+    
+            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+            cv2.rectangle(image, (xmin - 1, ymax + 35), (xmax + 1, ymax), color, cv2.FILLED)
+            cv2.putText(
+                image,
+                caption,
+                (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                color,
+                2,
+            )
+    
+        result_queue.put(detections)
+    
+        return av.VideoFrame.from_ndarray(image, format="bgr24")
+    
+    
+    webrtc_ctx = webrtc_streamer(
+        key="object-detection",
+        mode=WebRtcMode.SENDRECV,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        video_frame_callback=video_frame_callback,
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True,
     )
-    net.setInput(blob)
-    output = net.forward()
-
-    h, w = image.shape[:2]
-
-    # Convert the output array into a structured form.
-    output = output.squeeze()  # (1, 1, N, 7) -> (N, 7)
-    output = output[output[:, 2] >= score_threshold]
-    detections = [
-        Detection(
-            class_id=int(detection[1]),
-            label=CLASSES[int(detection[1])],
-            score=float(detection[2]),
-            box=(detection[3:7] * np.array([w, h, w, h])),
-        )
-        for detection in output
-    ]
-
-    # Render bounding boxes and captions
-    for detection in detections:
-        caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
-        color = COLORS[detection.class_id]
-        xmin, ymin, xmax, ymax = detection.box.astype("int")
-
-        cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
-        cv2.rectangle(image, (xmin - 1, ymax + 35), (xmax + 1, ymax), color, cv2.FILLED)
-        cv2.putText(
-            image,
-            caption,
-            (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.6,
-            color,
-            2,
-        )
-
-    result_queue.put(detections)
-
-    return av.VideoFrame.from_ndarray(image, format="bgr24")
-
-
-webrtc_ctx = webrtc_streamer(
-    key="object-detection",
-    mode=WebRtcMode.SENDRECV,
-    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    video_frame_callback=video_frame_callback,
-    media_stream_constraints={"video": True, "audio": False},
-    async_processing=True,
-)
 
 
 footer = """
