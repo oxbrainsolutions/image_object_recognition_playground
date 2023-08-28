@@ -868,8 +868,8 @@ with col2:
   """
 
   st.markdown(html, unsafe_allow_html=True)
-  score_threshold = st.slider(label="", label_visibility="collapsed", min_value=0.0, max_value=1.0, step=0.05, value=0.5)
-
+ # score_threshold = st.slider(label="", label_visibility="collapsed", min_value=0.0, max_value=1.0, step=0.05, value=0.5)
+  score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
   result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
 
   def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
