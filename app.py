@@ -844,10 +844,10 @@ col1, col2, col3 = st.columns([2, 4, 2])
 with col2:
     cache_key = "object_detection_dnn"
     if cache_key in st.session_state:
-      net = st.session_state[cache_key]
+        net = st.session_state[cache_key]
     else:
-      net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
-      st.session_state[cache_key] = net
+        net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
+        st.session_state[cache_key] = net
     
     html = """
     <div class="col2">
@@ -872,61 +872,34 @@ with col2:
     result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
    
     def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
-      image = frame.to_ndarray(format="bgr24")
+        image = frame.to_ndarray(format="bgr24")
     
-      # Run inference
-      blob = cv2.dnn.blobFromImage(
-          cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5
-      )
-      net.setInput(blob)
-      output = net.forward()
+        # Run inference
+        blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
+        net.setInput(blob)
+        output = net.forward()
+        
+        h, w = image.shape[:2]
+        # Convert the output array into a structured form.
+        output = output.squeeze()  # (1, 1, N, 7) -> (N, 7)
+        output = output[output[:, 2] >= score_threshold]
+        detections = [Detection(class_id=int(detection[1]), label=CLASSES[int(detection[1])], score=float(detection[2]), box=(detection[3:7] * np.array([w, h, w, h])),) for detection in output]
+        
+        # Render bounding boxes and captions
+        for detection in detections:
+            caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
+            color = COLORS[detection.class_id]
+            xmin, ymin, xmax, ymax = detection.box.astype("int")
+            
+            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+            cv2.rectangle(image, (xmin - 1, ymax + 35), (xmax + 1, ymax), color, cv2.FILLED)
+            cv2.putText(image, caption, (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2,)
+            
+        result_queue.put(detections)
+        
+        return av.VideoFrame.from_ndarray(image, format="bgr24")
     
-      h, w = image.shape[:2]
-    
-      # Convert the output array into a structured form.
-      output = output.squeeze()  # (1, 1, N, 7) -> (N, 7)
-      output = output[output[:, 2] >= score_threshold]
-      detections = [
-          Detection(
-              class_id=int(detection[1]),
-              label=CLASSES[int(detection[1])],
-              score=float(detection[2]),
-              box=(detection[3:7] * np.array([w, h, w, h])),
-          )
-          for detection in output
-      ]
-    
-      # Render bounding boxes and captions
-      for detection in detections:
-          caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
-          color = COLORS[detection.class_id]
-          xmin, ymin, xmax, ymax = detection.box.astype("int")
-    
-          cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
-          cv2.rectangle(image, (xmin - 1, ymax + 35), (xmax + 1, ymax), color, cv2.FILLED)
-          cv2.putText(
-              mage,
-              caption,
-              (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15),
-              cv2.FONT_HERSHEY_SIMPLEX,
-              0.6,
-              color,
-              2,
-          )
-    
-      result_queue.put(detections)
-    
-      return av.VideoFrame.from_ndarray(image, format="bgr24")
-    
-    
-    webrtc_ctx = webrtc_streamer(
-      key="object-detection",
-      mode=WebRtcMode.SENDRECV,
-      rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-      video_frame_callback=video_frame_callback,
-      media_stream_constraints={"video": True, "audio": False},
-      async_processing=True,
-    )
+    webrtc_ctx = webrtc_streamer(key="object-detection", mode=WebRtcMode.SENDRECV, rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}, video_frame_callback=video_frame_callback, media_stream_constraints={"video": True, "audio": False}, async_processing=True,)
 
 
 footer = """
