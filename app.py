@@ -43,6 +43,11 @@ def generate_label_colors():
 
 COLORS = generate_label_colors()
 
+class Detection(NamedTuple):
+    class_id: int
+    label: str
+    score: float
+    box: np.ndarray
 
 DEFAULT_CONFIDENCE_THRESHOLD = 0.5
 MODEL = "model/MobileNetSSD_deploy.caffemodel"
@@ -900,7 +905,7 @@ webrtc_ctx = webrtc_streamer(
     key="object-detection",
     mode=WebRtcMode.SENDRECV,
     rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    video_frame_callback=callback,
+    video_frame_callback=video_frame_callback,
     media_stream_constraints={"video": True, "audio": False},
     async_processing=True,
 )
