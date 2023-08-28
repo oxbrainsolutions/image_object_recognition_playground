@@ -887,7 +887,7 @@ if img_file_buffer is not None:
     image = np.array(Image.open(img_file_buffer))
 
 else:
-    blank_image = np.zeros(heigh, width, 3), dtype=np.uint8)
+    blank_image = np.zeros((heigh, width, 3), dtype=np.uint8)
     image = blank_image
 
 detections = process_image(image)
