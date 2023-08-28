@@ -54,6 +54,12 @@ MODEL = "model/MobileNetSSD_deploy.caffemodel"
 PROTOTXT = "model/MobileNetSSD_deploy.prototxt.txt"
 
 
+def img_to_bytes(img_path):
+    img_bytes = pathlib.Path(img_path).read_bytes()
+    encoded = base64.b64encode(img_bytes).decode()
+    return encoded
+
+
 marker_spinner_css = """
 <style>
     #spinner-container-marker {
