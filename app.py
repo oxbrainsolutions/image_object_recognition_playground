@@ -377,13 +377,13 @@ styles2 = """
         margin-bottom: 0em;
     }
     .left2 {
-        text-align: center;
+        text-align: left;
         width: 90%;
         padding-top: 0em;
         padding-bottom: 0em;
     }
     .right2 {
-        text-align: center;
+        text-align: right;
         width: 10%;
         padding-top: 0em;
         padding-bottom: 0em;
