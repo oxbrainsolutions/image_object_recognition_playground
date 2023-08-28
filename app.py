@@ -849,7 +849,19 @@ with col2:
       net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
       st.session_state[cache_key] = net
 
-#  score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
+  text_media_query = '''
+  <style>
+  @media (max-width: 1024px) {
+    p.text {
+        font-size: 4em;
+    }
+  }
+  </style>
+  '''
+    
+  text = '<p class="text" style="margin-top: 0em; margin-bottom: 0em;"><span style="font-family:sans-serif; color:#FAFAFA; font-size: 0.8em; ">Probability Threshold</span></p>'
+  st.markdown(text_media_query + text, unsafe_allow_html=True)
+  score_threshold = st.slider(label="", label_visibility="collapsed", min_value=0.0, max_value=1.0, step=0.05, value=0.5)
 
   result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
 
