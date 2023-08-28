@@ -562,7 +562,7 @@ st.markdown("""
         font-family: sans-serif !important;
         width: 50% !important;
     }
-    .css-y4arc3  {
+    divMuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation0.css-y4arc3  {
         border: 0.1875em solid #002147 !important;
         color: #FCBC24 !important;
     }
