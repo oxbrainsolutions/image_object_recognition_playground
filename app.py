@@ -886,12 +886,13 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
         xmin, ymin, xmax, ymax = detection.box.astype("int")
 
         cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
+   #     cv2.rectangle(image, (xmin - 1, ymin), (xmax, ymax), color, 2)
         cv2.putText(
             image,
             caption,
             (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15),
             cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
+            0.6,
             color,
             2,
         )
@@ -909,22 +910,6 @@ webrtc_ctx = webrtc_streamer(
     media_stream_constraints={"video": True, "audio": False},
     async_processing=True,
 )
-
-if st.checkbox("Show the detected labels", value=True):
-    if webrtc_ctx.state.playing:
-        labels_placeholder = st.empty()
-        # NOTE: The video transformation with object detection and
-        # this loop displaying the result labels are running
-        # in different threads asynchronously.
-        # Then the rendered video frames and the labels displayed here
-        # are not strictly synchronized.
-        while True:
-            result = result_queue.get()
-            labels_placeholder.table(result)
-
-
-
-
 
 
 footer = """
