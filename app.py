@@ -835,7 +835,7 @@ with col2:
   '''
   st.markdown(header_media_query + header_text, unsafe_allow_html=True)
   information_text1 = '''
-    <p class="information_text" style="margin-top: 2em; margin-bottom: 2em; text-align: justify;"><span style="color: #FAFAFA; font-family: sans-serif; font-size: 1em; ">In this interactive playground, you can explore the capabilities of AI and ML models to detect, recognize and identify objects within images in real-time. To begin, simply start the camera to allow an object recognition model to locate objects in the video. Investigate the tradeoff between precision and sensitivity of the model by tweaking the probability threshold, which determines the confidence level required for an object to be detected and recognized.</span></p>
+    <p class="information_text" style="margin-top: 2em; margin-bottom: 0em; text-align: justify;"><span style="color: #FAFAFA; font-family: sans-serif; font-size: 1em; ">In this interactive playground, you can explore the capabilities of AI and ML models to detect, recognize and identify objects within images in real-time. To begin, simply start the camera to allow an object recognition model to locate objects in the video. Investigate the tradeoff between precision and sensitivity of the model by tweaking the probability threshold, which determines the confidence level required for an object to be detected and recognized.</span></p>
   '''
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
