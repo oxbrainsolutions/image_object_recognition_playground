@@ -468,7 +468,7 @@ styles2 = """
     .tooltip2 .tooltiptext2 {
         border-width: 0.6em;
         border-radius: 1.6em;
-        width: 100em;
+        width: 90em;
         left: 50%;
     }
     .tooltip2 .tooltiptext2::after {
