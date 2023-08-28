@@ -886,7 +886,7 @@ def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
         xmin, ymin, xmax, ymax = detection.box.astype("int")
 
         cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
-   #     cv2.rectangle(image, (xmin - 1, ymin), (xmax, ymax), color, 2)
+        cv2.rectangle(image, (xmin - 1, ymax + 35), (xmax + 1, ymax), color, cv2.FILLED)
         cv2.putText(
             image,
             caption,
