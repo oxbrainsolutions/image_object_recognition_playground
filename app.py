@@ -849,7 +849,7 @@ with col2:
       net = cv2.dnn.readNetFromCaffe(PROTOTXT, MODEL)
       st.session_state[cache_key] = net
 
-  score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
+#  score_threshold = st.slider("Score threshold", 0.0, 1.0, 0.5, 0.05)
 
   result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
 
