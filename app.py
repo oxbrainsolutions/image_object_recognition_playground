@@ -870,6 +870,12 @@ with col2:
     st.markdown(html, unsafe_allow_html=True)
     score_threshold = st.slider(label="", label_visibility="collapsed", min_value=0.0, max_value=1.0, step=0.05, value=0.5)
     result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
+
+    def callback(frame):
+        img = frame.to_ndarray(format="bgr24")  
+        img = frame.to_ndarray(format="bgr24") 
+        img = cv2.cvtColor(cv2.Canny(img, 100, 200), cv2.COLOR_GRAY2BGR)
+        return av.VideoFrame.from_ndarray(img, format="bgr24")
     
     def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
       image = frame.to_ndarray(format="bgr24")
@@ -923,7 +929,7 @@ with col2:
       key="object-detection",
       mode=WebRtcMode.SENDRECV,
       rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-      video_frame_callback=video_frame_callback,
+      video_frame_callback=callback,
       media_stream_constraints={"video": True, "audio": False},
       async_processing=True,
     )
