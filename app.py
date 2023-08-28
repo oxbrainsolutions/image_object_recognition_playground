@@ -717,15 +717,8 @@ line_media_query2 = '''
 
 def callback(frame):
     img = frame.to_ndarray(format="bgr24")
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = imutils.resize(image, width=600)
-    rects = face_cascade.detectMultiScale(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-    for (x, y, w, h) in rects:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (252, 188, 36, 0), 2)
-
-
-#    img = frame.to_ndarray(format="bgr24") 
-#    img = cv2.cvtColor(cv2.Canny(img, 100, 200), cv2.COLOR_GRAY2BGR)
+    img = frame.to_ndarray(format="bgr24") 
+    img = cv2.cvtColor(cv2.Canny(img, 100, 200), cv2.COLOR_GRAY2BGR)
     return av.VideoFrame.from_ndarray(img, format="bgr24")
 
 def img_to_bytes(img_path):
@@ -907,7 +900,7 @@ webrtc_ctx = webrtc_streamer(
     key="object-detection",
     mode=WebRtcMode.SENDRECV,
     rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    video_frame_callback=video_frame_callback,
+    video_frame_callback=callback,
     media_stream_constraints={"video": True, "audio": False},
     async_processing=True,
 )
