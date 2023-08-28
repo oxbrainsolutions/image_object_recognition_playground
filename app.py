@@ -845,10 +845,7 @@ with col2:
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
 
-#The probability threshold is set based on a desired balance between minimizing both false positives (higher precision) and false negatives (higher sensitivity). Increasing the threshold value results in only objects with a high confidence level being detected, generating fewer but more reliable detections. Decreasing the threshold value creates more detections, including objects with slightly lower confidence scores; however, this may also introduce more false positives or incorrect detections.
-
-
-   cache_key = "object_detection_dnn"
+  cache_key = "object_detection_dnn"
   if cache_key in st.session_state:
       net = st.session_state[cache_key]
   else:
