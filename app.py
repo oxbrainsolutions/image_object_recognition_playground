@@ -847,7 +847,7 @@ with col2:
   '''
   st.markdown(header_media_query + header_text, unsafe_allow_html=True)
   information_text1 = '''
-    <p class="information_text" style="margin-top: 2em; margin-bottom: 2em; text-align: justify;"><span style="color: #FAFAFA; font-family: sans-serif; font-size: 1em; ">In this interactive playground, you can explore the capabilities of AI and ML models to detect, recognize and identify objects within images in real-time. To begin, simply start the camera to allow an object recognition model to locate objects in the video. Investigate the tradeoff between precision and sensitivity of the model by tweaking the probability threshold, which determines the confidence level required for an object to be detected and recognized.</span></p>
+    <p class="information_text" style="margin-top: 2em; margin-bottom: 2em; text-align: justify;"><span style="color: #FAFAFA; font-family: sans-serif; font-size: 1em; ">In this interactive playground, you can explore the capabilities of AI and ML models to detect, recognize and identify objects within images in real-time. To begin, simply start the camera to allow an object recognition model to locate objects in the video. Investigate the tradeoff between accuracy and performance of the model by tweaking the probability threshold, which determines the confidence level required for an object to be detected and recognized. Please note that the software may run slowly on some devices.</span></p>
   '''
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
@@ -871,7 +871,7 @@ with col2:
               <i class="fas fa-info-circle fa-2x"></i>
               <span class="tooltiptext2">
                   <ul class="responsive-ul2">
-                      The probability threshold is set based on a desired balance between minimizing both false positives (higher precision) and false negatives (higher sensitivity). Increasing the threshold value results in only objects with a high confidence level being identified, generating fewer but more reliable detections. Decreasing the threshold value creates more detections, including objects with slightly lower confidence scores; however, this may also introduce more false positives or incorrect detections.
+                      By exploring the probability threshold in this playground, you can gain insights into how it affects the accuracy and performance of the model in real-time object detection and recognition tasks. The probability threshold is set based on a desired balance between minimizing both false positives (higher precision) and false negatives (higher sensitivity). Increasing the threshold value results in only objects with a high confidence level being identified, generating fewer but more reliable detections. Decreasing the threshold value creates more detections, including objects with slightly lower confidence scores; however, this may also introduce more false positives or incorrect detections.
                   </ul>    
               </span>
           </div>
