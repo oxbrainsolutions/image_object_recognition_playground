@@ -12,7 +12,7 @@ from typing import List, NamedTuple
 
 st.set_page_config(page_title="Object Recognition Playground", page_icon="images/oxbrain_favicon.png", layout="wide")
 
-#st.elements.utils._shown_default_value_warning=True
+st.elements.utils._shown_default_value_warning=True
 
 CLASSES = [
     "background",
