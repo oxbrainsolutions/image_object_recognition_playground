@@ -46,7 +46,7 @@ def generate_label_colors():
     num_classes = len(CLASSES)
     values = np.linspace(0, 1, num_classes)
     colors = col_cmap(values)
-    label_colors = (colors[:, :3] * 255)
+    label_colors = (colors[:, :3][:, ::-1] * 255)
     return label_colors
 
 COLORS = generate_label_colors()
@@ -848,7 +848,6 @@ with col2:
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
 
-st.write(COLORS)
 col1, col2, col3 = st.columns([2, 4, 2])
 with col2:
     cache_key = "object_detection_dnn"
