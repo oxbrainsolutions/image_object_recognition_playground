@@ -39,7 +39,7 @@ CLASSES = [
 ]
 
 @st.cache_resource  # type: ignore
-def generate_label_colors():
+def generate_label_colors_alt():
     color1 = "#5007E3"
     color2 = "#03A9F4"
     col_cmap = clr.LinearSegmentedColormap.from_list(name="", colors=[color1, color2])
@@ -48,6 +48,12 @@ def generate_label_colors():
     colors = col_cmap(values)
     label_colors = np.round(colors[:, :3] * 255).astype(int)
     return label_colors
+
+@st.cache_resource  # type: ignore
+def generate_label_colors():
+    lower_limit = np.array([227, 7, 80])
+    upper_limit = np.array([244, 169, 3])
+    return np.random.randint(lower_limit, upper_limit, size=(len(CLASSES), 3))
 
 COLORS = generate_label_colors()
 
@@ -847,7 +853,8 @@ with col2:
   '''
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
-  
+
+st.write(COLORS)
 col1, col2, col3 = st.columns([2, 4, 2])
 with col2:
     cache_key = "object_detection_dnn"
