@@ -901,8 +901,7 @@ with col2:
             color = COLORS[detection.class_id]
             xmin, ymin, xmax, ymax = detection.box.astype("int")
             
-            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 2)
-            cv2.rectangle(image, (xmin - 1, ymax + 35), (xmax + 1, ymax), color, cv2.FILLED)
+            cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 4)
             cv2.putText(image, caption, (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2,)
             
         result_queue.put(detections)
