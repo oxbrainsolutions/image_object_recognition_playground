@@ -39,21 +39,15 @@ CLASSES = [
 ]
 
 @st.cache_resource  # type: ignore
-def generate_label_colors_alt():
+def generate_label_colors():
     color1 = "#5007E3"
     color2 = "#03A9F4"
     col_cmap = clr.LinearSegmentedColormap.from_list(name="", colors=[color1, color2])
     num_classes = len(CLASSES)
     values = np.linspace(0, 1, num_classes)
     colors = col_cmap(values)
-    label_colors = np.round(colors[:, :3] * 255).astype(int)
+    label_colors = (colors[:, :3] * 255)
     return label_colors
-
-@st.cache_resource  # type: ignore
-def generate_label_colors():
-    lower_limit = np.array([227, 7, 80])
-    upper_limit = np.array([244, 169, 3])
-    return np.random.randint(lower_limit, upper_limit, size=(len(CLASSES), 3))
 
 COLORS = generate_label_colors()
 
