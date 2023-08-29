@@ -37,15 +37,15 @@ CLASSES = [
     "tvmonitor",
 ]
 
-def hex_to_rgba(hex_color):
-    hex_color = hex_color.lstrip('#')  # Remove the '#' character if present
-    r = int(hex_color[0:2], 16)
-    g = int(hex_color[2:4], 16)
-    b = int(hex_color[4:6], 16)
-    return (r, g, b, 255)
-
 @st.cache_resource  # type: ignore
 def generate_label_colors():
+    def hex_to_rgba(hex_color):
+        hex_color = hex_color.lstrip('#')  # Remove the '#' character if present
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        return (r, g, b, 255)
+  
     color1 = hex_to_rgba('#5007E3')
     color2 = hex_to_rgba('#03A9F4')
     colors = np.linspace(color1, color2, num=len(CLASSES), axis=0)
