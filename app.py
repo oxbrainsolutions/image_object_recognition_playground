@@ -905,7 +905,7 @@ with col2:
         for detection in detections:
             caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
             color = COLORS[detection.class_id]
-            st.write(color)
+            color = (22, 129, 240)
             xmin, ymin, xmax, ymax = detection.box.astype("int")
             
             cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 4)
