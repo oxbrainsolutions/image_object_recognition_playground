@@ -851,6 +851,8 @@ with col2:
   '''
   subheader_text_field2 = st.empty()
   subheader_text_field2.markdown(information_media_query + information_text1, unsafe_allow_html=True)
+  st.write("hello")
+  st.write(COLORS)
 
 col1, col2, col3 = st.columns([2, 4, 2])
 with col2:
