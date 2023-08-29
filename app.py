@@ -39,18 +39,16 @@ CLASSES = [
 
 @st.cache_resource  # type: ignore
 def generate_label_colors():
-    def hex_to_rgba(hex_color):
-        hex_color = hex_color.lstrip('#')  # Remove the '#' character if present
-        r = int(hex_color[0:2], 16)
-        g = int(hex_color[2:4], 16)
-        b = int(hex_color[4:6], 16)
-        return (r, g, b, 255)
-  
-    color1 = hex_to_rgba('#5007E3')
-    color2 = hex_to_rgba('#03A9F4')
-    colors = np.linspace(color1, color2, num=len(CLASSES), axis=0)
-    colors = np.round(colors).astype(int)
-    return colors
+    color_range_start = int('5007E3', 16)
+    color_range_end = int('03A9F4', 16)
+    num_classes = len(CLASSES)
+
+    label_colors = []
+    for _ in range(num_classes):
+        random_color = random.randint(color_range_start, color_range_end)
+        color_hex = '#{0:06x}'.format(random_color)
+        label_colors.append(hex_to_rgba(color_hex))
+    return label_colors
 
 
 COLORS = generate_label_colors()
