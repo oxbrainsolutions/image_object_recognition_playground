@@ -53,7 +53,7 @@ def generate_label_colors_alt():
 def generate_label_colors():
     return np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
-COLORS = generate_label_colors()
+COLORS = generate_label_colors_alt()
 COLORS_ALT = generate_label_colors_alt()
 
 class Detection(NamedTuple):
