@@ -39,7 +39,7 @@ CLASSES = [
 ]
 
 @st.cache_resource  # type: ignore
-def generate_label_colors():
+def generate_label_colors_alt():
     color1 = "#5007E3"
     color2 = "#03A9F4"
     col_cmap = clr.LinearSegmentedColormap.from_list(name="", colors=[color1, color2])
@@ -49,6 +49,9 @@ def generate_label_colors():
     label_colors = [clr.rgb2hex(color) for color in colors]
     return label_colors
 
+@st.cache_resource  # type: ignore
+def generate_label_colors():
+    return np.random.uniform(0, 255, size=(len(CLASSES), 3))
 COLORS = generate_label_colors()
 
 class Detection(NamedTuple):
