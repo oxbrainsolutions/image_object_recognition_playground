@@ -5,7 +5,7 @@ import pathlib
 import base64
 import cv2
 import av
-import random
+import matplotlib.colors as clr
 import queue
 from pathlib import Path
 from typing import List, NamedTuple
@@ -40,17 +40,14 @@ CLASSES = [
 
 @st.cache_resource  # type: ignore
 def generate_label_colors():
-    color_range_start = int('5007E3', 16)
-    color_range_end = int('03A9F4', 16)
+    color1 = "#5007E3"
+    color2 = "#03A9F4"
+    col_cmap = clr.LinearSegmentedColormap.from_list(name="", colors=[color1, color2])
     num_classes = len(CLASSES)
-
-    label_colors = []
-    for _ in range(num_classes):
-        random_color = random.randint(color_range_start, color_range_end)
-        color_hex = '#{0:06x}'.format(random_color)
-        label_colors.append(hex_to_rgba(color_hex))
+    values = np.linspace(0, 1, num_classes)
+    colors = col_cmap(values)
+    label_colors = [clr.rgb2hex(color) for color in colors]
     return label_colors
-
 
 COLORS = generate_label_colors()
 
