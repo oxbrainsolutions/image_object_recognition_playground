@@ -867,7 +867,9 @@ with col2:
               <i class="fas fa-info-circle fa-2x"></i>
               <span class="tooltiptext2">
                   <ul class="responsive-ul2">
-                      By exploring the probability threshold in this playground, you can gain insights into how it affects the accuracy and performance of the model in real-time object detection and recognition tasks. The probability threshold is set based on a desired balance between minimizing both false positives (higher precision) and false negatives (higher sensitivity). Increasing the threshold value results in only objects with a high confidence level being identified, generating fewer but more reliable detections. Decreasing the threshold value creates more detections, including objects with slightly lower confidence scores; however, this may also introduce more false positives or incorrect detections.
+                      By exploring the probability threshold in this playground, you can gain insights into how it affects the accuracy and performance of the model in real-time object detection and recognition tasks. The probability threshold is set based on a desired balance between minimizing both false positives (higher precision) and false negatives (higher sensitivity).</br>
+                      <li>Increasing the threshold value results in only objects with a high confidence level being identified, generating fewer but more reliable detections.<\li>
+                      <li>Decreasing the threshold value creates more detections, including objects with slightly lower confidence scores; however, this may also introduce more false positives or incorrect detections.<\li>
                   </ul>    
               </span>
           </div>
