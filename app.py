@@ -860,7 +860,7 @@ with col2:
     html = """
     <div class="col2">
       <div class="left2">
-          <p class="subtext_manual2" style="tyle="text-align: left;"><span style="font-family: sans-serif; color:#FAFAFA; font-size: 1em;">Probability Threshold</span></p>
+          <p class="subtext_manual2" style="tyle="text-align: left;"><span style="font-family: sans-serif; color:#FAFAFA; font-size: 1em;">Probability Threshold %</span></p>
       </div>
       <div class="right2">
           <div class="tooltip2">
@@ -878,7 +878,7 @@ with col2:
     """
     
     st.markdown(html, unsafe_allow_html=True)
-    score_threshold = st.slider(label="", label_visibility="collapsed", min_value=0.0, max_value=1.0, step=0.05, value=0.5)
+    score_threshold = st.slider(label="", label_visibility="collapsed", min_value=0, max_value=100, step=5, value=50)
     result_queue: "queue.Queue[List[Detection]]" = queue.Queue()
    
     def video_frame_callback(frame: av.VideoFrame) -> av.VideoFrame:
@@ -892,7 +892,7 @@ with col2:
         h, w = image.shape[:2]
         # Convert the output array into a structured form.
         output = output.squeeze()  # (1, 1, N, 7) -> (N, 7)
-        output = output[output[:, 2] >= score_threshold]
+        output = output[output[:, 2] >= score_threshold / 100]
         detections = [Detection(class_id=int(detection[1]), label=CLASSES[int(detection[1])], score=float(detection[2]), box=(detection[3:7] * np.array([w, h, w, h])),) for detection in output]
         
         # Render bounding boxes and captions
