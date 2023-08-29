@@ -53,7 +53,7 @@ def generate_label_colors_alt():
 def generate_label_colors():
     return np.random.uniform(0, 255, size=(len(CLASSES), 3))
 
-COLORS = generate_label_colors_alt()
+COLORS = generate_label_colors()
 COLORS_ALT = generate_label_colors_alt()
 
 class Detection(NamedTuple):
@@ -905,6 +905,7 @@ with col2:
         for detection in detections:
             caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
             color = COLORS[detection.class_id]
+            st.write(color)
             xmin, ymin, xmax, ymax = detection.box.astype("int")
             
             cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 4)
