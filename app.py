@@ -897,11 +897,10 @@ with col2:
         
         # Render bounding boxes and captions
         for detection in detections:
-            xmin, ymin, xmax, ymax = detection.box.astype("int")
-            caption = f"{detection.label}, {xmin}, {ymin}: {round(detection.score * 100, 2)}%"
+            caption = f"{detection.label}: {round(detection.score * 100, 2)}%"
             color = COLORS[detection.class_id]
-            
-            
+            xmin, ymin, xmax, ymax = detection.box.astype("int")
+                        
             cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 4)
             cv2.putText(image, caption, (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2,)
             
