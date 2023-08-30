@@ -897,7 +897,7 @@ with col2:
         
         # Render bounding boxes and captions
         for detection in detections:
-            caption = f"{detection.label}: {round(detection.score * 100, 0)}%"
+            caption = f"{detection.label}: {round(detection.score * 100)}%"
             color = COLORS[detection.class_id]
             xmin, ymin, xmax, ymax = detection.box.astype("int")
                         
