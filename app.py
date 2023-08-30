@@ -903,7 +903,6 @@ with col2:
             
             cv2.rectangle(image, (xmin, ymin), (xmax, ymax), color, 4)
             cv2.putText(image, caption, (xmin, ymin - 15 if ymin - 15 > 15 else ymin + 15), cv2.FONT_HERSHEY_SIMPLEX, 0.6, color, 2,)
-            cv2.putText(image, "Hello", (0.5, 0.5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
             
         result_queue.put(detections)
         
